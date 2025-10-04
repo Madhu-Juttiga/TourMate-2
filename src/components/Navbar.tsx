@@ -1,7 +1,7 @@
-import { MapPin, Menu, X } from 'lucide-react';
+import { MapPin, Menu, X, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface NavbarProps {
   onNearbyClick?: () => void;
@@ -12,6 +12,23 @@ interface NavbarProps {
 
 const Navbar = ({ onNearbyClick, onFestivalsClick, onTransportClick, onTripsClick }: NavbarProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [theme, setTheme] = useState<'default' | 'sky'>('default');
+
+  // Load theme from localStorage on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('app-theme') as 'default' | 'sky' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'default' ? 'sky' : 'default';
+    setTheme(newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('app-theme', newTheme);
+  };
 
   const handleMenuClick = (callback?: () => void) => {
     setIsOpen(false);
@@ -73,6 +90,16 @@ const Navbar = ({ onNearbyClick, onFestivalsClick, onTransportClick, onTripsClic
               </div>
             </SheetContent>
           </Sheet>
+
+          <Button
+            variant="glass"
+            size="icon"
+            onClick={toggleTheme}
+            className="shrink-0"
+            title={theme === 'default' ? 'Switch to Sky Theme' : 'Switch to Default Theme'}
+          >
+            <Palette className="w-5 h-5" />
+          </Button>
 
           <div className="hidden md:flex gap-3">
             <Button variant="glass" size="sm" onClick={onNearbyClick}>

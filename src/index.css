@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* TourMate Color Palette */
+    /* TourMate Color Palette - Default Theme */
     --background: 259 93% 5%;  /* #0A0118 - Deep dark blue */
     --foreground: 0 0% 100%;   /* White text */
 
@@ -48,6 +48,46 @@ All colors MUST be HSL.
     --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(270 75% 85%));
     --gradient-card: linear-gradient(135deg, hsl(259 50% 10% / 0.6), hsl(270 50% 15% / 0.4));
   }
+
+  /* Sky Blue Theme */
+  [data-theme="sky"] {
+    --background: 200 100% 97%;  /* Very light blue-white */
+    --foreground: 200 95% 25%;   /* Deep sky blue text */
+
+    --card: 200 50% 98%;        /* White with hint of blue */
+    --card-foreground: 200 95% 25%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 95% 25%;
+
+    --primary: 199 89% 48%;     /* Bright sky blue */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 197 71% 73%;   /* Light sky blue */
+    --secondary-foreground: 200 95% 25%;
+
+    --muted: 200 30% 90%;
+    --muted-foreground: 200 40% 45%;
+
+    --accent: 197 71% 73%;      /* Light sky blue accent */
+    --accent-foreground: 200 95% 25%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 200 40% 85%;
+    --input: 0 0% 100%;
+    --ring: 199 89% 48%;
+
+    /* Glassmorphism effects for sky theme */
+    --glass-bg: 200 50% 98% / 0.6;
+    --glass-border: 199 89% 48% / 0.2;
+    --glass-shadow: 0 8px 32px 0 rgba(14, 165, 233, 0.15);
+    
+    /* Gradients for sky theme */
+    --gradient-primary: linear-gradient(135deg, hsl(199 89% 48%), hsl(197 71% 73%));
+    --gradient-card: linear-gradient(135deg, hsl(200 50% 98% / 0.8), hsl(197 71% 95% / 0.6));
+  }
 }
 
 @layer base {
@@ -60,10 +100,14 @@ All colors MUST be HSL.
     background: linear-gradient(135deg, hsl(259 93% 5%), hsl(270 80% 8%));
     min-height: 100vh;
   }
+
+  [data-theme="sky"] body {
+    background: linear-gradient(135deg, hsl(200 100% 97%), hsl(197 71% 95%));
+  }
 }
 
 @layer utilities {
-  /* Glassmorphism utilities */
+  /* Glassmorphism utilities - Default Theme */
   .glass {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
@@ -92,5 +136,28 @@ All colors MUST be HSL.
   
   .glass-hover:active {
     transform: translateY(-2px);
+  }
+
+  /* Glassmorphism utilities - Sky Theme */
+  [data-theme="sky"] .glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(14, 165, 233, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(14, 165, 233, 0.15);
+  }
+  
+  [data-theme="sky"] .glass-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(186, 230, 253, 0.4));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(14, 165, 233, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(14, 165, 233, 0.2);
+  }
+  
+  [data-theme="sky"] .glass-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px 0 rgba(14, 165, 233, 0.3);
+    border-color: rgba(14, 165, 233, 0.5);
   }
 }
