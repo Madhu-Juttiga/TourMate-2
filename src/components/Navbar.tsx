@@ -3,9 +3,13 @@ import { Button } from '@/components/ui/button';
 
 interface NavbarProps {
   onMenuClick?: () => void;
+  onNearbyClick?: () => void;
+  onFestivalsClick?: () => void;
+  onTransportClick?: () => void;
+  onTripsClick?: () => void;
 }
 
-const Navbar = ({ onMenuClick }: NavbarProps) => {
+const Navbar = ({ onMenuClick, onNearbyClick, onFestivalsClick, onTransportClick, onTripsClick }: NavbarProps) => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-card">
       <div className="container mx-auto px-4 py-4">
@@ -29,16 +33,16 @@ const Navbar = ({ onMenuClick }: NavbarProps) => {
           </Button>
 
           <div className="hidden md:flex gap-3">
-            <Button variant="glass" size="sm">
+            <Button variant="glass" size="sm" onClick={onNearbyClick}>
               Nearby
             </Button>
-            <Button variant="glass" size="sm">
+            <Button variant="glass" size="sm" onClick={onFestivalsClick}>
               Festivals
             </Button>
-            <Button variant="glass" size="sm">
+            <Button variant="glass" size="sm" onClick={onTransportClick}>
               Transport
             </Button>
-            <Button variant="glass" size="sm">
+            <Button variant="glass" size="sm" onClick={onTripsClick}>
               My Trips
             </Button>
           </div>

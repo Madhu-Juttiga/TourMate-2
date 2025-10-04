@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Place, FilterType, SortType, ViewMode, Bus, City } from '@/types';
 import Navbar from '@/components/Navbar';
 import SearchBar from '@/components/SearchBar';
@@ -29,6 +29,35 @@ const Index = () => {
   const [sortBy, setSortBy] = useState<SortType>('distance');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Refs for scrolling to sections
+  const placesRef = useRef<HTMLDivElement>(null);
+  const festivalsRef = useRef<HTMLDivElement>(null);
+  const transportRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to section handlers
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleNearbyClick = () => {
+    scrollToSection(placesRef);
+    toast.success('Showing nearby places');
+  };
+
+  const handleFestivalsClick = () => {
+    scrollToSection(festivalsRef);
+    toast.success('Showing upcoming festivals');
+  };
+
+  const handleTransportClick = () => {
+    scrollToSection(transportRef);
+    toast.success('Showing transport options');
+  };
+
+  const handleTripsClick = () => {
+    toast.info('My Trips feature coming soon!');
+  };
 
   // Load places for selected city
   useEffect(() => {
@@ -106,7 +135,12 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
+      <Navbar 
+        onNearbyClick={handleNearbyClick}
+        onFestivalsClick={handleFestivalsClick}
+        onTransportClick={handleTransportClick}
+        onTripsClick={handleTripsClick}
+      />
       
       {/* Hero Section */}
       <div className="relative h-[50vh] overflow-hidden">
@@ -156,7 +190,7 @@ const Index = () => {
         />
 
         {/* Places Grid */}
-        <div className="space-y-6">
+        <div ref={placesRef} className="space-y-6 scroll-mt-20">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">
               Places in {selectedCity.name} <span className="text-muted-foreground text-base font-normal">({filteredPlaces.length} found)</span>
@@ -192,14 +226,25 @@ const Index = () => {
         </div>
 
         {/* Upcoming Festivals */}
-        {upcomingFestivals.length > 0 && (
-          <UpcomingFestivals festivals={upcomingFestivals} />
-        )}
+        <div ref={festivalsRef} className="scroll-mt-20">
+          {upcomingFestivals.length > 0 && (
+            <UpcomingFestivals festivals={upcomingFestivals} />
+          )}
+        </div>
 
         {/* Bus Info Section */}
-        {selectedPlace && buses.length > 0 && (
-          <BusInfo buses={buses} destination={selectedPlace.name} />
-        )}
+        <div ref={transportRef} className="scroll-mt-20">
+          {buses.length > 0 ? (
+            <BusInfo buses={buses} destination={selectedPlace?.name || selectedCity.name} />
+          ) : (
+            <div className="glass-card rounded-3xl p-8">
+              <h3 className="text-2xl font-bold mb-4">Transport Options</h3>
+              <p className="text-muted-foreground">
+                Select a place to view available bus routes and transport options from {selectedCity.name}.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Place Details Modal */}
