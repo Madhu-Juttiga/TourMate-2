@@ -22,11 +22,30 @@ const Index = () => {
   const [currentLocation, setCurrentLocation] = useState<string>('');
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [buses, setBuses] = useState<Bus[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [sortBy, setSortBy] = useState<SortType>('distance');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Fetch location name
+  const fetchLocationName = async (latitude: number, longitude: number) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-location-name', {
+        body: { latitude, longitude },
+      });
+
+      if (error) throw error;
+
+      if (data?.locationName) {
+        setCurrentLocation(data.locationName);
+      }
+    } catch (error) {
+      console.error('Error fetching location name:', error);
+      setCurrentLocation(`${latitude.toFixed(2)}, ${longitude.toFixed(2)}`);
+    }
+  };
 
   // Fetch nearby places from Google Places API
   const fetchNearbyPlaces = async (latitude: number, longitude: number) => {
@@ -47,6 +66,39 @@ const Index = () => {
       toast.error('Failed to fetch nearby places. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Search places using Google Places Text Search
+  const searchPlaces = async (query: string) => {
+    if (!query.trim() || !userCoords) {
+      // If no query, show nearby places
+      setFilteredPlaces(places);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-place-search', {
+        body: {
+          query,
+          latitude: userCoords.lat,
+          longitude: userCoords.lng,
+          radius: 50000,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.places) {
+        setFilteredPlaces(data.places);
+        toast.success(`Found ${data.places.length} results for "${query}"`);
+      }
+    } catch (error) {
+      console.error('Error searching places:', error);
+      toast.error('Search failed. Please try again.');
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -82,9 +134,9 @@ const Index = () => {
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          setCurrentLocation(`${lat.toFixed(2)}, ${lng.toFixed(2)}`);
           setUserCoords({ lat, lng });
           toast.success('Location detected!');
+          fetchLocationName(lat, lng);
           fetchNearbyPlaces(lat, lng);
         },
         (error) => {
@@ -101,41 +153,42 @@ const Index = () => {
     }
   }, []);
 
-  // Filter and sort places
+  // Handle search with debounce
   useEffect(() => {
-    let result = [...places];
+    const timeoutId = setTimeout(() => {
+      if (searchQuery) {
+        searchPlaces(searchQuery);
+      } else {
+        // If no search query, show all places with filters
+        let result = [...places];
 
-    // Apply category filter
-    if (activeFilter !== 'all') {
-      result = result.filter((place) => place.category === activeFilter);
-    }
+        // Apply category filter
+        if (activeFilter !== 'all') {
+          result = result.filter((place) => place.category === activeFilter);
+        }
 
-    // Apply search query
-    if (searchQuery) {
-      result = result.filter((place) =>
-        place.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        place.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
+        // Apply sorting
+        result.sort((a, b) => {
+          switch (sortBy) {
+            case 'distance':
+              return a.distance - b.distance;
+            case 'rating':
+              return b.rating - a.rating;
+            case 'entryFee':
+              const aFee = a.entryFee === 'Free' ? 0 : parseInt(a.entryFee.replace(/[^0-9]/g, ''));
+              const bFee = b.entryFee === 'Free' ? 0 : parseInt(b.entryFee.replace(/[^0-9]/g, ''));
+              return aFee - bFee;
+            default:
+              return 0;
+          }
+        });
 
-    // Apply sorting
-    result.sort((a, b) => {
-      switch (sortBy) {
-        case 'distance':
-          return a.distance - b.distance;
-        case 'rating':
-          return b.rating - a.rating;
-        case 'entryFee':
-          const aFee = a.entryFee === 'Free' ? 0 : parseInt(a.entryFee.replace(/[^0-9]/g, ''));
-          const bFee = b.entryFee === 'Free' ? 0 : parseInt(b.entryFee.replace(/[^0-9]/g, ''));
-          return aFee - bFee;
-        default:
-          return 0;
+        setFilteredPlaces(result);
       }
-    });
+    }, 500);
 
-    setFilteredPlaces(result);
-  }, [places, activeFilter, sortBy, searchQuery]);
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, places, activeFilter, sortBy]);
 
   const handleViewDetails = (place: Place) => {
     setSelectedPlace(place);
@@ -185,7 +238,11 @@ const Index = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 space-y-8 -mt-20 relative z-10">
         {/* Search Bar */}
-        <SearchBar onSearch={setSearchQuery} currentLocation={currentLocation} />
+        <SearchBar 
+          onSearch={setSearchQuery} 
+          currentLocation={currentLocation}
+          isSearching={isSearching}
+        />
 
         {locationError && (
           <div className="glass-card rounded-2xl p-4 flex items-center gap-3 border-destructive/50">
