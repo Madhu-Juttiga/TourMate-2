@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Place, FilterType, SortType, ViewMode } from '@/types';
-import { mockPlaces, mockBuses } from '@/lib/mockData';
+import { Place, FilterType, SortType, ViewMode, Bus } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import SearchBar from '@/components/SearchBar';
 import FilterBar from '@/components/FilterBar';
@@ -20,41 +20,84 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [locationError, setLocationError] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<string>('');
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [buses, setBuses] = useState<Bus[]>([]);
   
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [sortBy, setSortBy] = useState<SortType>('distance');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Fetch nearby places from Google Places API
+  const fetchNearbyPlaces = async (latitude: number, longitude: number) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-nearby-places', {
+        body: { latitude, longitude, radius: 50000 },
+      });
+
+      if (error) throw error;
+
+      if (data?.places) {
+        setPlaces(data.places);
+        setFilteredPlaces(data.places);
+        toast.success(`Found ${data.places.length} nearby places!`);
+      }
+    } catch (error) {
+      console.error('Error fetching places:', error);
+      toast.error('Failed to fetch nearby places. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch transit routes when a place is selected
+  const fetchTransitRoutes = async (destLat: number, destLng: number) => {
+    if (!userCoords) return;
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-transit-routes', {
+        body: {
+          originLat: userCoords.lat,
+          originLng: userCoords.lng,
+          destLat,
+          destLng,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.buses) {
+        setBuses(data.buses);
+      }
+    } catch (error) {
+      console.error('Error fetching transit routes:', error);
+      setBuses([]);
+    }
+  };
+
   // Detect user location
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setCurrentLocation(`${position.coords.latitude.toFixed(2)}, ${position.coords.longitude.toFixed(2)}`);
-          // TODO: Replace with actual API call
-          setTimeout(() => {
-            setPlaces(mockPlaces);
-            setFilteredPlaces(mockPlaces);
-            setLoading(false);
-            toast.success('Location detected successfully!');
-          }, 1500);
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          setCurrentLocation(`${lat.toFixed(2)}, ${lng.toFixed(2)}`);
+          setUserCoords({ lat, lng });
+          toast.success('Location detected!');
+          fetchNearbyPlaces(lat, lng);
         },
         (error) => {
           console.error('Location error:', error);
           setLocationError(true);
           setLoading(false);
-          toast.error('Unable to detect location. Using default places.');
-          setPlaces(mockPlaces);
-          setFilteredPlaces(mockPlaces);
+          toast.error('Unable to detect location.');
         }
       );
     } else {
       setLocationError(true);
       setLoading(false);
       toast.error('Geolocation not supported by your browser.');
-      setPlaces(mockPlaces);
-      setFilteredPlaces(mockPlaces);
     }
   }, []);
 
@@ -97,6 +140,8 @@ const Index = () => {
   const handleViewDetails = (place: Place) => {
     setSelectedPlace(place);
     setIsDetailsOpen(true);
+    // Fetch transit routes to this place
+    fetchTransitRoutes(place.location.lat, place.location.lng);
   };
 
   if (loading) {
@@ -193,28 +238,24 @@ const Index = () => {
         </div>
 
         {/* Bus Info Section */}
-        {selectedPlace && (
-          <BusInfo buses={mockBuses} destination={selectedPlace.name} />
+        {selectedPlace && buses.length > 0 && (
+          <BusInfo buses={buses} destination={selectedPlace.name} />
         )}
 
-        {/* API Configuration Notice */}
+        {/* Live Data Status */}
         <div className="glass-card rounded-3xl p-6 space-y-4">
           <h3 className="text-lg font-bold flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-accent" />
-            API Configuration Required
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            Live Data Connected
           </h3>
           <p className="text-muted-foreground">
-            TourMate is ready for live data integration! To enable real-time features, you'll need to configure:
+            TourMate is now connected to Google Places API and showing real-time data for nearby sacred places and tourist attractions.
           </p>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>• <strong>Google Places API</strong> - For nearby temples and attractions</li>
-            <li>• <strong>Google Maps Transit API</strong> - For bus and public transport routes</li>
-            <li>• <strong>Festival Data API</strong> - For temple festivals and events (Wikipedia API or custom)</li>
-            <li>• <strong>Google Maps Directions API</strong> - For navigation support</li>
+            <li>✓ <strong>Google Places API</strong> - Nearby temples and attractions</li>
+            <li>✓ <strong>Google Maps Transit API</strong> - Bus and public transport routes</li>
+            <li>• <strong>Enhanced Features</strong> - Maps integration coming soon</li>
           </ul>
-          <p className="text-xs text-muted-foreground">
-            Currently using mock data for demonstration. Replace API calls in the codebase with your preferred services.
-          </p>
         </div>
       </div>
 
