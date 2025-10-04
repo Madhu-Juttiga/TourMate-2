@@ -12,6 +12,7 @@ export interface Place {
   distance: number; // in km from city center
   image: string;
   thumbnail: string;
+  gallery?: string[]; // 5-10 images for image gallery
   rating: number;
   timings: string;
   entryFee: string;

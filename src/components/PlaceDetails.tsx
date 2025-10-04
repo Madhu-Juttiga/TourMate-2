@@ -1,8 +1,11 @@
 import { Place } from '@/types';
-import { X, MapPin, Star, Clock, IndianRupee, Navigation, Share2, Calendar } from 'lucide-react';
+import { X, MapPin, Star, Clock, IndianRupee, Navigation, Share2, Calendar, Images } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import ImageGallery from '@/components/ImageGallery';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 interface PlaceDetailsProps {
   place: Place | null;
@@ -11,6 +14,8 @@ interface PlaceDetailsProps {
 }
 
 const PlaceDetails = ({ place, open, onClose }: PlaceDetailsProps) => {
+  const [showGallery, setShowGallery] = useState(false);
+  
   if (!place) return null;
 
   const handleNavigate = () => {
@@ -41,18 +46,56 @@ const PlaceDetails = ({ place, open, onClose }: PlaceDetailsProps) => {
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Image */}
-          <div className="relative h-64 rounded-2xl overflow-hidden">
-            <img
-              src={place.image}
-              alt={place.name}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute top-3 right-3 glass-card px-4 py-2 rounded-full flex items-center gap-2">
-              <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-              <span className="text-lg font-bold">{place.rating}</span>
+          {/* Image Carousel */}
+          {place.gallery && place.gallery.length > 0 ? (
+            <div className="relative">
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {place.gallery.slice(0, 4).map((image, index) => (
+                    <CarouselItem key={index}>
+                      <div className="relative h-64 rounded-2xl overflow-hidden">
+                        <img
+                          src={image}
+                          alt={`${place.name} - Image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="left-2" />
+                <CarouselNext className="right-2" />
+              </Carousel>
+              
+              {/* Rating Badge */}
+              <div className="absolute top-3 right-3 glass-card px-4 py-2 rounded-full flex items-center gap-2 z-10">
+                <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                <span className="text-lg font-bold">{place.rating}</span>
+              </div>
+
+              {/* View All Photos Button */}
+              <Button
+                variant="glass"
+                className="w-full mt-3"
+                onClick={() => setShowGallery(true)}
+              >
+                <Images className="w-4 h-4 mr-2" />
+                View All {place.gallery.length} Photos
+              </Button>
             </div>
-          </div>
+          ) : (
+            <div className="relative h-64 rounded-2xl overflow-hidden">
+              <img
+                src={place.image}
+                alt={place.name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute top-3 right-3 glass-card px-4 py-2 rounded-full flex items-center gap-2">
+                <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                <span className="text-lg font-bold">{place.rating}</span>
+              </div>
+            </div>
+          )}
 
           {/* Category Badge */}
           <div className="flex items-center gap-3">
@@ -127,6 +170,18 @@ const PlaceDetails = ({ place, open, onClose }: PlaceDetailsProps) => {
           </div>
         </div>
       </DialogContent>
+
+      {/* Image Gallery Modal */}
+      {place.gallery && place.gallery.length > 0 && (
+        <Dialog open={showGallery} onOpenChange={setShowGallery}>
+          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl">Photo Gallery - {place.name}</DialogTitle>
+            </DialogHeader>
+            <ImageGallery images={place.gallery} placeName={place.name} />
+          </DialogContent>
+        </Dialog>
+      )}
     </Dialog>
   );
 };
