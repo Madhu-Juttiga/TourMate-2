@@ -47,59 +47,61 @@ const Navbar = ({ onNearbyClick, onFestivalsClick, onTransportClick, onTripsClic
             </h1>
           </div>
           
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
-              <Button 
-                variant="glass" 
-                size="icon"
-                className="md:hidden"
-              >
-                <Menu className="w-5 h-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-64 glass-card border-border/50">
-              <div className="flex flex-col gap-4 mt-8">
+          <div className="flex items-center gap-2">
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
                 <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-lg"
-                  onClick={() => handleMenuClick(onNearbyClick)}
+                  variant="glass" 
+                  size="icon"
+                  className="md:hidden"
                 >
-                  Nearby
+                  <Menu className="w-5 h-5" />
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-lg"
-                  onClick={() => handleMenuClick(onFestivalsClick)}
-                >
-                  Festivals
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-lg"
-                  onClick={() => handleMenuClick(onTransportClick)}
-                >
-                  Transport
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-lg"
-                  onClick={() => handleMenuClick(onTripsClick)}
-                >
-                  My Trips
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-64 glass-card border-border/50">
+                <div className="flex flex-col gap-4 mt-8">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-lg"
+                    onClick={() => handleMenuClick(onNearbyClick)}
+                  >
+                    Nearby
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-lg"
+                    onClick={() => handleMenuClick(onFestivalsClick)}
+                  >
+                    Festivals
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-lg"
+                    onClick={() => handleMenuClick(onTransportClick)}
+                  >
+                    Transport
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-lg"
+                    onClick={() => handleMenuClick(onTripsClick)}
+                  >
+                    My Trips
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
 
-          <Button
-            variant="glass"
-            size="icon"
-            onClick={toggleTheme}
-            className="shrink-0"
-            title={theme === 'default' ? 'Switch to Sky Theme' : 'Switch to Default Theme'}
-          >
-            <Palette className="w-5 h-5" />
-          </Button>
+            <Button
+              variant="glass"
+              size="icon"
+              onClick={toggleTheme}
+              className="shrink-0"
+              title={theme === 'default' ? 'Switch to Sky Theme' : 'Switch to Default Theme'}
+            >
+              <Palette className="w-5 h-5" />
+            </Button>
+          </div>
 
           <div className="hidden md:flex gap-3">
             <Button variant="glass" size="sm" onClick={onNearbyClick}>
