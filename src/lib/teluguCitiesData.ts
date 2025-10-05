@@ -58,7 +58,7 @@ export const teluguCitiesData: CityData[] = [
         timings: '4:30 AM - 1:00 PM, 4:00 PM - 9:00 PM',
         entryFee: 'Free',
         image: 'https://images.unsplash.com/photo-1624832502623-caddf05f0b30?w=800',
-        thumbnail: 'https://images.unsplash.com/photo-1624832502623-caddf05f0b30?w=400',
+        thumbnail: 'https://images.unsplash.com/photo-1660280037297-a3b5e79a3d20?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         gallery: [
           'https://images.unsplash.com/photo-1624832502623-caddf05f0b30?w=1200',
           'https://images.unsplash.com/photo-1605649487212-47e3366f0804?w=1200',
@@ -81,7 +81,7 @@ export const teluguCitiesData: CityData[] = [
         timings: 'Open 24 hours',
         entryFee: 'Free',
         image: 'https://images.unsplash.com/photo-1609920658906-8223bd289001?w=800',
-        thumbnail: 'https://images.unsplash.com/photo-1609920658906-8223bd289001?w=400',
+        thumbnail: 'https://images.unsplash.com/photo-1706439807959-dbba5716e12f?q=80&w=1331&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         gallery: [
           'https://images.unsplash.com/photo-1609920658906-8223bd289001?w=1200',
           'https://images.unsplash.com/photo-1605649487212-47e3366f0804?w=1200',
