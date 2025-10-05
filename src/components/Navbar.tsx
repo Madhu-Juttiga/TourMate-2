@@ -1,4 +1,4 @@
-import { MapPin, Menu, X, Palette } from 'lucide-react';
+import { MapPin, Menu, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useState, useEffect } from 'react';
@@ -34,10 +34,12 @@ const Navbar = ({ onNearbyClick, onFestivalsClick, onTransportClick, onTripsClic
     setIsOpen(false);
     callback?.();
   };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-card">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
+          {/* Logo */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
               <MapPin className="w-6 h-6 text-white" />
@@ -52,51 +54,62 @@ const Navbar = ({ onNearbyClick, onFestivalsClick, onTransportClick, onTripsClic
               </p>
             </div>
           </div>
-          
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
-              <Button 
-                variant="glass" 
-                size="icon"
-                className="md:hidden"
-              >
-                <Menu className="w-5 h-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-64 glass-card border-border/50">
-              <div className="flex flex-col gap-4 mt-8">
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-lg"
-                  onClick={() => handleMenuClick(onNearbyClick)}
-                >
-                  Nearby
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-lg"
-                  onClick={() => handleMenuClick(onFestivalsClick)}
-                >
-                  Festivals
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-lg"
-                  onClick={() => handleMenuClick(onTransportClick)}
-                >
-                  Transport
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-lg"
-                  onClick={() => handleMenuClick(onTripsClick)}
-                >
-                  My Trips
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
 
+          {/* Mobile Menu + Theme Toggle */}
+          <div className="flex items-center gap-2 md:hidden">
+            {/* Menu button */}
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="glass" size="icon">
+                  <Menu className="w-5 h-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-64 glass-card border-border/50">
+                <div className="flex flex-col gap-4 mt-8">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-lg"
+                    onClick={() => handleMenuClick(onNearbyClick)}
+                  >
+                    Nearby
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-lg"
+                    onClick={() => handleMenuClick(onFestivalsClick)}
+                  >
+                    Festivals
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-lg"
+                    onClick={() => handleMenuClick(onTransportClick)}
+                  >
+                    Transport
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-lg"
+                    onClick={() => handleMenuClick(onTripsClick)}
+                  >
+                    My Trips
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
+
+            {/* Theme toggle button comes AFTER menu button */}
+            <Button
+              variant="glass"
+              size="icon"
+              onClick={toggleTheme}
+              title={theme === 'default' ? 'Switch to Sky Theme' : 'Switch to Default Theme'}
+            >
+              <Palette className="w-5 h-5" />
+            </Button>
+          </div>
+
+          {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-3">
             <Button variant="glass" size="sm" onClick={onNearbyClick}>
               Nearby
