@@ -175,8 +175,7 @@ const Index = () => {
 
         {/* Search Bar */}
         <SearchBar 
-          onSearch={handleSearch} 
-          currentLocation={`${selectedCity.name}, ${selectedCity.state}`}
+          onSearch={handleSearch}
         />
 
         {/* Filters */}

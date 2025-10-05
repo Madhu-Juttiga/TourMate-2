@@ -5,10 +5,9 @@ import { useState } from 'react';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
-  currentLocation?: string;
 }
 
-const SearchBar = ({ onSearch, currentLocation }: SearchBarProps) => {
+const SearchBar = ({ onSearch }: SearchBarProps) => {
   const [query, setQuery] = useState('');
 
   const handleSearch = () => {
@@ -43,13 +42,6 @@ const SearchBar = ({ onSearch, currentLocation }: SearchBarProps) => {
           <Search className="w-5 h-5 sm:hidden" />
         </Button>
       </div>
-      
-      {currentLocation && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <MapPin className="w-4 h-4 text-accent" />
-          <span>{currentLocation}</span>
-        </div>
-      )}
     </div>
   );
 };
