@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Place, FilterType, SortType, ViewMode, Bus, City } from '@/types';
 import Navbar from '@/components/Navbar';
 import SearchBar from '@/components/SearchBar';
@@ -20,7 +20,6 @@ const Index = () => {
   
   const [selectedCity, setSelectedCity] = useState<City>(defaultCity);
   const [places, setPlaces] = useState<Place[]>([]);
-  const [filteredPlaces, setFilteredPlaces] = useState<Place[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [buses, setBuses] = useState<Bus[]>([]);
@@ -64,8 +63,6 @@ const Index = () => {
     const cityData = getCityData(selectedCity.id);
     if (cityData) {
       setPlaces(cityData.places);
-      setFilteredPlaces(cityData.places);
-      toast.success(`Showing ${cityData.places.length} places in ${selectedCity.name}`);
     }
   }, [selectedCity]);
 
@@ -77,12 +74,12 @@ const Index = () => {
   };
 
   // Handle search
-  const handleSearch = (query: string) => {
+  const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
-  };
+  }, []);
 
-  // Apply filters and search
-  useEffect(() => {
+  // Apply filters and search with useMemo for better performance
+  const filteredPlaces = useMemo(() => {
     let result = [...places];
 
     // Apply search filter
@@ -117,10 +114,10 @@ const Index = () => {
       }
     });
 
-    setFilteredPlaces(result);
+    return result;
   }, [searchQuery, places, activeFilter, sortBy]);
 
-  const handleViewDetails = (place: Place) => {
+  const handleViewDetails = useCallback((place: Place) => {
     setSelectedPlace(place);
     setIsDetailsOpen(true);
     
@@ -129,7 +126,7 @@ const Index = () => {
     if (cityData) {
       setBuses(cityData.buses);
     }
-  };
+  }, [selectedCity.id]);
 
   const upcomingFestivals = getUpcomingUtsavs().slice(0, 6);
 
@@ -148,6 +145,7 @@ const Index = () => {
           src={heroImage}
           alt="Hero"
           className="w-full h-full object-cover"
+          loading="eager"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/70 to-background" />
         <div className="absolute inset-0 flex items-center justify-center text-center px-4">

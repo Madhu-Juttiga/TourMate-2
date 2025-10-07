@@ -1,13 +1,14 @@
 import { Place } from '@/types';
 import { MapPin, Star, Clock, IndianRupee } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { memo } from 'react';
 
 interface PlaceCardProps {
   place: Place;
   onViewDetails: (place: Place) => void;
 }
 
-const PlaceCard = ({ place, onViewDetails }: PlaceCardProps) => {
+const PlaceCard = memo(({ place, onViewDetails }: PlaceCardProps) => {
   return (
     <div className="glass-card rounded-3xl overflow-hidden glass-hover cursor-pointer" onClick={() => onViewDetails(place)}>
       <div className="relative h-48 overflow-hidden">
@@ -15,6 +16,8 @@ const PlaceCard = ({ place, onViewDetails }: PlaceCardProps) => {
           src={place.thumbnail}
           alt={place.name}
           className="w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
         />
         <div className="absolute top-3 right-3 glass-card px-3 py-1 rounded-full flex items-center gap-1">
           <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
@@ -55,6 +58,8 @@ const PlaceCard = ({ place, onViewDetails }: PlaceCardProps) => {
       </div>
     </div>
   );
-};
+});
+
+PlaceCard.displayName = 'PlaceCard';
 
 export default PlaceCard;
